@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Diary Entries</h2>
+
+<div class="filter-bar">
+    <input type="text" id="searchInput" placeholder="🔍 Search notes, bugs, tech..." oninput="filterEntries()">
+    <input type="date" id="dateFilter" onchange="filterEntries()">
+    <a href="/export/txt" class="btn" style="background: #007bff;">📄 Export as TXT</a>
+</div>
+
+<div id="entries"></div>
+
+<script>
+let allEntries = [];
+
+async function loadEntries() {
+    const res = await fetch("/entries");
+    allEntries = await res.json();
+    renderEntries(allEntries);
+}
+
+function renderEntries(entries) {
+    const container = document.getElementById("entries");
+    container.innerHTML = "";
+
+    if (entries.length === 0) {
+        container.innerHTML = "<p>No matching entries found.</p>";
+        return;
+    }
+
+    entries.forEach(entry => {
+        const div = document.createElement("div");
+        div.className = "entry";
+        div.innerHTML = `
+            <p><strong>Date:</strong> <span contenteditable="true" data-key="date">${entry.date}</span></p>
+            <p><strong>Note:</strong> <span contenteditable="true" data-key="note">${entry.note}</span></p>
+            <p><strong>Bugs:</strong> <span contenteditable="true" data-key="bugs">${entry.bugs}</span></p>
+            <p><strong>Fixes:</strong> <span contenteditable="true" data-key="fixes">${entry.fixes}</span></p>
+            <p><strong>Tech:</strong> <span contenteditable="true" data-key="tech">${entry.tech}</span></p>
+            <div style="margin-top: 10px;">
+                <button onclick="deleteEntry('${entry._id}')">🗑 Delete</button>
+                <button onclick="saveEdit(this, '${entry._id}')">💾 Save</button>
+            </div>
+        `;
+        container.prepend(div);
+    });
+}
+
+function filterEntries() {
+    const keyword = document.getElementById("searchInput").value.toLowerCase();
+    const date = document.getElementById("dateFilter").value;
+
+    const filtered = allEntries.filter(entry => {
+        const matchesDate = date ? entry.date === date : true;
+        const combinedText = `${entry.note} ${entry.tech} ${entry.bugs} ${entry.fixes}`.toLowerCase();
+        return matchesDate && combinedText.includes(keyword);
+    });
+
+    renderEntries(filtered);
+}
+
+async function deleteEntry(id) {
+    if (confirm("Delete this entry?")) {
+        await fetch(`/delete/${id}`, { method: "DELETE" });
+        loadEntries();
+    }
+}
+
+async function saveEdit(button, id) {
+    const container = button.parentElement.parentElement;
+    const fields = container.querySelectorAll("[contenteditable='true']");
+    const updatedData = {};
+    fields.forEach(el => {
+        const key = el.getAttribute("data-key");
+        updatedData[key] = el.innerText.trim();
+    });
+
+    await fetch(`/edit/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedData)
+    });
+
+    alert("Entry updated!");
+}
+
+loadEntries();
+</script>
+{% endblock %}

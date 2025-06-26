@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="entry">
+    <h2>Add New Entry</h2>
+    <form id="diaryForm">
+        <input type="text" name="date" placeholder="Date (e.g. 2025-06-26)" required>
+        <input type="text" name="tech" placeholder="Technologies Used">
+        <textarea name="note" placeholder="What did you work on?"></textarea>
+        <textarea name="bugs" placeholder="What bugs did you face?"></textarea>
+        <textarea name="fixes" placeholder="How did you fix them?"></textarea>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+<script>
+document.getElementById('diaryForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(this).entries());
+
+    const res = await fetch("/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (res.ok) {
+        alert("Entry saved!");
+        this.reset();
+    }
+});
+</script>
+{% endblock %}

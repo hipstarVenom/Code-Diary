@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="entry">
+    <h1>Welcome to Code Diary</h1>
+    <p>This app helps you keep track of your daily programming tasks.</p>
+    <ul style="margin-top: 15px; padding-left: 20px;">
+        <li>📝 Log what you did</li>
+        <li>🐞 Track bugs you faced</li>
+        <li>🛠 Record how you fixed them</li>
+        <li>📖 Look back anytime</li>
+    </ul>
+
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('enter') }}" class="btn">➕ Add Entry</a>
+        <a href="{{ url_for('view') }}" class="btn">📚 View Logs</a>
+    </div>
+</div>
+{% endblock %}
