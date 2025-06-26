@@ -40,3 +40,6 @@ User authentication
 Tags or categories
 CSV or JSON export
 Cloud deployment
+
+Home:
+https://github.com/hipstarVenom/Code-Diary/blob/ede6a640ab29282ab36aa01c77d782b284efcfa3/images/Screenshot%202025-06-26%20220234.png
